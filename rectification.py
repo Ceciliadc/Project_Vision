@@ -109,6 +109,7 @@ for image in im_list:
                 (tl, tr, br, bl) = src
             except:
                 continue
+
             widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
             widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
             maxWidth = max(int(widthA), int(widthB))
