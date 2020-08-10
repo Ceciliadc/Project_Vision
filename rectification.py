@@ -20,6 +20,7 @@ def order_points(pts):
 
 
 def get_corners(image):
+    #rect = None
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blur = cv2.bilateralFilter(gray, 9, 75, 75)
     #erosion = cv2.erode(blur, np.ones((9, 9), np.uint8), iterations=2)
@@ -109,7 +110,7 @@ for image in im_list:
                 (tl, tr, br, bl) = src
             except:
                 continue
-
+            print(src)
             widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
             widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
             maxWidth = max(int(widthA), int(widthB))
@@ -132,6 +133,6 @@ for image in im_list:
             warped = cv2.warpPerspective(crop, ret, (maxWidth, maxHeight))
             print(im_name)
             cv2.imwrite(
-                f'{output_path}/{im_name}-rect-.png', warped)
+                f'{output_path}/{im_name}-rect{i}-.png', warped)
             #cv2.imshow('warped', warped)
             #cv2.waitKey(0)
