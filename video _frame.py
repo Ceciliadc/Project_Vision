@@ -36,6 +36,7 @@ for file in os.listdir(videos_path):
 
 label_list.sort(key=natural_keys)
 
+num_frame = 0
 for video in videos_list:
     print(video)
     cap = cv2.VideoCapture(videos_path + '/' + video)
@@ -45,10 +46,11 @@ for video in videos_list:
     frame_num = 0
 
     # get total number of frames
-    total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
     # get video's fps
     fps = cap.get(cv2.CAP_PROP_FPS)
-    #print(fps)
+
     # get total seconds of video
     total_seconds = int(total_frames / fps)
 
@@ -57,8 +59,6 @@ for video in videos_list:
 
     # or set the jump of frames = fps, so that I get one frame every fps frames (one frame per second)
     skip_frame = int(fps)
-    #label = [l for l in label_list if os.path.splitext(video)[0] in l]
-    #devo trovare un modo per prendere solo i txt corrispondenti al video corrente
 
     # for every second of the video, I take one frame every skip_frame
     for i in range(1, total_seconds + 2):
@@ -79,12 +79,15 @@ for video in videos_list:
 
         cv2.imwrite(
             f'{output_path}/{file_name}_{my_frame}.png', frame)
+
         print(f'{file_name}_{my_frame}.png')
         shutil.copy(videos_path + '\\' + label_list[my_frame-1], output_path)
-        #non va bene perchè con i txt non si riesce a fare il salto al video successivo
-        #finito un video l'indice my_frame ritorna ad essere 29 e quindi viene ripreso il 1_29.txt
 
         print(label_list[my_frame-1])
+
+    num_frame += total_frames
+
+    label_list = label_list[num_frame:]
 
     # cap.release()
     cv2.destroyAllWindows()
