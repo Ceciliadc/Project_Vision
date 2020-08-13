@@ -79,11 +79,10 @@ for video in videos_list:
 
         cv2.imwrite(
             f'{output_path}/{file_name}_{my_frame}.png', frame)
+        #print(f'{file_name}_{my_frame}.png')
 
-        print(f'{file_name}_{my_frame}.png')
         shutil.copy(videos_path + '\\' + label_list[my_frame-1], output_path)
-
-        print(label_list[my_frame-1])
+        #print(label_list[my_frame-1])
 
     num_frame += total_frames
     label_list = label_list[num_frame:]
