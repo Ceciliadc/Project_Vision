@@ -86,7 +86,6 @@ for video in videos_list:
         print(label_list[my_frame-1])
 
     num_frame += total_frames
-
     label_list = label_list[num_frame:]
 
     # cap.release()
