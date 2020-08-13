@@ -97,8 +97,10 @@ im_list.sort(key=natural_keys)
 
 for image in im_list:
     im_name = os.path.splitext(os.path.basename(image))[0]
-
-    file = open(im_path + '\\' + im_name + ".txt", 'r')
+    try:
+        file = open(im_path + '\\' + im_name + ".txt", 'r')
+    except:
+        continue
     txt = file.readlines()
 
     im = cv2.imread(image)

@@ -77,13 +77,13 @@ for video in videos_list:
             frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         # save the frame in the output path created at the beginning. the image will be saved as VIRB0398-frame-0.png
 
-        cv2.imwrite(
-            f'{output_path}/{file_name}_{my_frame}.png', frame)
-        #print(f'{file_name}_{my_frame}.png')
+        if os.path.exists(videos_path + '\\' + label_list[my_frame-1]):
+            cv2.imwrite(
+                f'{output_path}/{file_name}_{my_frame}.png', frame)
 
-        shutil.copy(videos_path + '\\' + label_list[my_frame-1], output_path)
-        #print(label_list[my_frame-1])
-
+            shutil.copy(videos_path + '\\' + label_list[my_frame-1], output_path)
+        else:
+            continue
     num_frame += total_frames
     label_list = label_list[num_frame:]
 
