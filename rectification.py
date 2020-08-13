@@ -1,8 +1,22 @@
 import os
+import re
+
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import glob
+
+
+def atof(text):
+    try:
+        retval = float(text)
+    except ValueError:
+        retval = text
+    return retval
+
+
+def natural_keys(text):
+    return [atof(c) for c in re.split(r'[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)', text)]
 
 
 def order_points(pts):
@@ -62,22 +76,36 @@ def get_corners(image):
         #cv2.waitKey(0)
         return rect
 
-
-im_path ="D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\000 - 014 correct_bb\\images"
-im_list = glob.glob(f'{im_path}/*.*', recursive=False)
+#path da modificare
+im_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\images"
+im_list = glob.glob(f'{im_path}/*.png', recursive=False)
 output_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\painting_rect"
-file_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\000 - 014 correct_bb\\labels"
-file_list = glob.glob(f'{file_path}/*.*', recursive=False)
+#file_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\000 - 014 correct_bb\\labels"
+#file_list = glob.glob(f'{im_path}/*.txt', recursive=False)
+
+'''file_list = []
+im_list = []
+
+for file in os.listdir(im_path):
+    if file.endswith('.txt'):
+        file_list.append(file)
+    else:
+        im_list.append(file)'''
+#file_list.sort(key=natural_keys)
+im_list.sort(key=natural_keys)
+
 
 for image in im_list:
-
     im_name = os.path.splitext(os.path.basename(image))[0]
-    file = open(file_path + '\\' + im_name + ".txt", 'r')
+
+    file = open(im_path + '\\' + im_name + ".txt", 'r')
     txt = file.readlines()
+
     im = cv2.imread(image)
     im_h, im_w, _ = im.shape
 
     for i in range(len(txt)): #per ogni riga del file, quindi per ogni bounding box
+
         coordinates = txt[i].split()
 
         if coordinates[0] == '0': #considero solo i quadri, quindi id=0
@@ -110,7 +138,7 @@ for image in im_list:
                 (tl, tr, br, bl) = src
             except:
                 continue
-            print(src)
+            #print(src)
             widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
             widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
             maxWidth = max(int(widthA), int(widthB))
@@ -131,8 +159,9 @@ for image in im_list:
             #ret = cv2.getPerspectiveTransform(src, dst)
 
             warped = cv2.warpPerspective(crop, ret, (maxWidth, maxHeight))
-            print(im_name)
+
             cv2.imwrite(
                 f'{output_path}/{im_name}-rect{i}-.png', warped)
-            #cv2.imshow('warped', warped)
-            #cv2.waitKey(0)
+            print(f'{im_name}-rect{i}-.png')
+            cv2.imshow('warped', warped)
+            cv2.waitKey(0)
