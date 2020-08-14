@@ -35,14 +35,14 @@ for file in os.listdir(videos_path):
         videos_list.append(file)
 
 label_list.sort(key=natural_keys)
-
 num_frame = 0
 for video in videos_list:
-    print(video)
+    #print(video)
     cap = cv2.VideoCapture(videos_path + '/' + video)
 
     file_path, file_extension = os.path.splitext(video)
     file_name = os.path.basename(file_path)
+
     frame_num = 0
 
     # get total number of frames
@@ -77,15 +77,15 @@ for video in videos_list:
             frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         # save the frame in the output path created at the beginning. the image will be saved as VIRB0398-frame-0.png
 
-        if os.path.exists(videos_path + '\\' + label_list[my_frame-1]):
+        #save in item the only file txt that matches the frame name
+        item = [l for l in label_list if (file_name + '_' + str(my_frame) + '.txt') in l]
+        if item:
             cv2.imwrite(
                 f'{output_path}/{file_name}_{my_frame}.png', frame)
 
-            shutil.copy(videos_path + '\\' + label_list[my_frame-1], output_path)
+            shutil.copy(videos_path + '\\' + item[0], output_path)
         else:
             continue
-    num_frame += total_frames
-    label_list = label_list[num_frame:]
 
     # cap.release()
     cv2.destroyAllWindows()
