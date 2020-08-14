@@ -33,9 +33,11 @@ def order_points(pts):
     return points
 
 
-def get_corners(image):
-    #rect = None
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def get_corners(image, alpha, beta, gamma):
+    rect = None
+    new_image = np.zeros(image.shape, image.dtype)
+    new_image[:, :, :] = np.clip(alpha * image[:, :, :] + beta, 0, 255)
+    gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
     blur = cv2.bilateralFilter(gray, 9, 75, 75)
     #erosion = cv2.erode(blur, np.ones((9, 9), np.uint8), iterations=2)
     #dilation = cv2.dilate(erosion, np.ones((9, 9), np.uint8), iterations=2)
@@ -74,7 +76,8 @@ def get_corners(image):
 
         #cv2.imshow("corners_img", corners_img)
         #cv2.waitKey(0)
-        return rect
+        return rect, True
+    return rect, False
 
 #path da modificare
 im_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\images"
@@ -82,6 +85,11 @@ im_list = glob.glob(f'{im_path}/*.png', recursive=False)
 output_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\painting_rect"
 #file_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\000 - 014 correct_bb\\labels"
 #file_list = glob.glob(f'{im_path}/*.txt', recursive=False)
+
+try:
+    os.makedirs(output_path)
+except:
+    print('error')
 
 '''file_list = []
 im_list = []
@@ -130,17 +138,18 @@ for image in im_list:
 
             # taglio l'immagine tenendo solo la bounding box
             crop = im[max(y1, 0):max(y2, 0), max(x1, 0):max(x2, 0)]
-
+            params = [[10.0, -500, 0.04], [1.0, 0, 0.03], [10.0, -300, 0.02], [2.0, 0, 0.01], [7.0, -500, 0.05],
+                      [7.0, -500, 0.06], [1.0, 0, 0.07], [1.0, 0, 0.07], [1.0, 0, 0.08], [7.0, -800, 0.09]]
+            found = False
             #cv2.imshow('crop', crop)
             #cv2.waitKey(0)
             #src, bbox = get_corners(crop, draw=True)
-            try:
-                src = get_corners(crop)
-                #print('src: ', src)
-                (tl, tr, br, bl) = src
-            except:
-                continue
-            #print(src)
+            src = []
+            while not found and i!=10:
+                src, found = get_corners(crop, params[i][0], params[i][1], params[i][2])
+                i += 1
+
+            (tl, tr, br, bl) = src
             widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
             widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
             maxWidth = max(int(widthA), int(widthB))
