@@ -1,8 +1,7 @@
-import glob
 import os
 import re
 import shutil
-
+import math
 import cv2
 
 def atof(text):
@@ -17,9 +16,9 @@ def natural_keys(text):
     return [atof(c) for c in re.split(r'[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)', text)]
 
 # path of our input videos. da modificare
-videos_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\output"
+videos_path = "./Project material/output"
 # path of our output folder where we save the extracted frames. da modificare
-output_path = "D:\\CECILIA\\Desktop\\Vision and Cognitive Systems\\progetto-vision\\Project material\\images"
+output_path = "./Project material/painting"
 try:
     os.makedirs(output_path)
 except:
@@ -47,7 +46,7 @@ for video in videos_list:
 
     # get total number of frames
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
+    print('tot frames', total_frames)
     # get video's fps
     fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -57,15 +56,15 @@ for video in videos_list:
     # divide total frames by total seconds to get one frame per second
     # my_frame = int(total_frames / total_seconds)
 
-    # or set the jump of frames = fps, so that I get one frame every fps frames (one frame per second)
-    skip_frame = int(fps)
+    # or set the jump of frames = fps, so that I get two frames per second
+    skip_frame = int(fps) // 2
 
     # for every second of the video, I take one frame every skip_frame
-    for i in range(1, total_seconds + 2):
+    for i in range(1, total_frames):
         my_frame = i * skip_frame
 
         # check for valid frame number
-        if my_frame >= 0 & my_frame <= total_frames:
+        if my_frame >= 0 and my_frame <= total_frames:
             # set frame position, frame to save
             cap.set(cv2.CAP_PROP_POS_FRAMES, my_frame)
         else:
@@ -77,8 +76,10 @@ for video in videos_list:
             frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         # save the frame in the output path created at the beginning. the image will be saved as VIRB0398-frame-0.png
 
+        print('file name', file_name + '_' + str(my_frame))
         #save in item the only file txt that matches the frame name
-        item = [l for l in label_list if (file_name + '_' + str(my_frame) + '.txt') in l]
+        item = [l for l in label_list if l.startswith(file_name + '_' + str(my_frame) + '.txt')]
+        print(item)
         if item:
             cv2.imwrite(
                 f'{output_path}/{file_name}_{my_frame}.png', frame)
