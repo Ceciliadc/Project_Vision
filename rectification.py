@@ -132,7 +132,7 @@ def warp_image(src_points, crop_img):
 
 im_path = "./Project material/painting"
 im_list = glob.glob(f'{im_path}/*.png', recursive=False)
-output_path = "./Project material/painting_rect"
+output_path = "./Project material/painting_rect1"
 
 try:
     os.makedirs(output_path)

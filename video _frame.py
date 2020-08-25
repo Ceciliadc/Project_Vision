@@ -46,7 +46,7 @@ for video in videos_list:
 
     # get total number of frames
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print('tot frames', total_frames)
+
     # get video's fps
     fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -61,6 +61,18 @@ for video in videos_list:
 
     # for every second of the video, I take one frame every skip_frame
     for i in range(1, total_frames):
+
+        if total_frames <= skip_frame:
+            ret, frame = cap.read()
+            item = [l for l in label_list if l.startswith(file_name + '_' + str(i) + '.txt')]
+            if item:
+                cv2.imwrite(
+                    f'{output_path}/{file_name}_{i}.png', frame)
+
+                shutil.copy(videos_path + '\\' + item[0], output_path)
+
+            continue
+
         my_frame = i * skip_frame
 
         # check for valid frame number
