@@ -1,5 +1,7 @@
 import os
 import re
+import shutil
+
 from scipy.spatial import distance as dist
 
 import cv2
@@ -47,60 +49,62 @@ def order_points(pts):
 
 
 def get_corners(image, alpha, beta, t):
-        rect = None
-        new_image = np.zeros(image.shape, image.dtype)
-        new_image[:, :, :] = np.clip(alpha * image[:, :, :] + beta, 0, 255)
-        #cv2.imshow('new_image', new_image)
-        #cv2.waitKey(0)
-        gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
-        blur = cv2.bilateralFilter(gray, 9, 75, 75)
 
-        _, thresh = cv2.threshold(
-            blur, t, 255, cv2.THRESH_BINARY_INV)
-        #cv2.imshow('thresh', thresh)
-        #cv2.waitKey(0)
-        #thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 85, 1)
+    rect = None
+    new_image = np.zeros(image.shape, image.dtype)
+    new_image[:, :, :] = np.clip(alpha * image[:, :, :] + beta, 0, 255)
+    #cv2.imshow('new_image', new_image)
+    #cv2.waitKey(0)
+    gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
+    blur = cv2.bilateralFilter(gray, 9, 75, 75)
 
-        contours, _ = cv2.findContours(
-            thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    _, thresh = cv2.threshold(
+        blur, t, 255, cv2.THRESH_BINARY_INV)
+    #cv2.imshow('thresh', thresh)
+    #cv2.waitKey(0)
+    #thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 85, 1)
 
-        try:
-            c = max(contours, key=cv2.contourArea)
-        except:
-            print('contours not found')
-            return rect, False
+    _, contours, _ = cv2.findContours(
+        thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        x, y, w, h = cv2.boundingRect(c)
-        c_size = h * w
-        #bbox = x, y, w, h
 
-        #cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-
-        accuracy = 0.09*cv2.arcLength(c, True)
-        approx = cv2.approxPolyDP(c, accuracy, True)
-        area = cv2.contourArea(approx)
-        corners_img = image.copy()
-
-        if len(approx) == 4:
-
-            if area > 10000 and abs(c_size - image.shape[0] * image.shape[1]) >= 0.5:
-                cv2.drawContours(corners_img, [approx], 0, (0, 255, 0), 2)
-
-                approx = np.reshape(approx, (4, 2))
-                rect = order_points(approx)
-
-                for i, corner in enumerate(rect):
-                    x_corner = int(corner[0])
-                    y_corner = int(corner[1])
-
-                    cv2.circle(corners_img, (x_corner, y_corner), 1, (255, 0, 0), 2)
-                    cv2.putText(corners_img, f'{i}', (x_corner, y_corner),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.75, color=(255, 0, 0))
-
-                #cv2.imshow("corners_img", corners_img)
-                #cv2.waitKey(0)
-                return rect, True
+    try:
+        c = max(contours, key=cv2.contourArea)
+    except:
+        print('contours not found')
         return rect, False
+
+    x, y, w, h = cv2.boundingRect(c)
+    c_size = h * w
+    #bbox = x, y, w, h
+
+    #cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
+    accuracy = 0.09*cv2.arcLength(c, True)
+    approx = cv2.approxPolyDP(c, accuracy, True)
+    area = cv2.contourArea(approx)
+    corners_img = image.copy()
+
+    if len(approx) == 4:
+
+        if area > 10000 and abs(c_size - image.shape[0] * image.shape[1]) >= 0.5:
+            cv2.drawContours(corners_img, [approx], 0, (0, 255, 0), 2)
+
+            approx = np.reshape(approx, (4, 2))
+            rect = order_points(approx)
+
+            for i, corner in enumerate(rect):
+                x_corner = int(corner[0])
+                y_corner = int(corner[1])
+
+                cv2.circle(corners_img, (x_corner, y_corner), 1, (255, 0, 0), 2)
+                cv2.putText(corners_img, f'{i}', (x_corner, y_corner),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.75, color=(255, 0, 0))
+
+            #cv2.imshow("corners_img", corners_img)
+            #cv2.waitKey(0)
+            return rect, True
+    return rect, False
 
 
 def warp_image(src_points, crop_img):
@@ -130,9 +134,9 @@ def warp_image(src_points, crop_img):
     return warped_image
 
 
-im_path = "./Project material/painting"
+im_path = "../../../Project_material/painting"
 im_list = glob.glob(f'{im_path}/*.png', recursive=False)
-output_path = "./Project material/painting_rect1"
+output_path = "../../../Project_material/painting_rect1"
 
 try:
     os.makedirs(output_path)
@@ -194,6 +198,7 @@ for image in im_list:
             #cv2.waitKey(0)
             #src, bbox = get_corners(crop, draw=True)
             src = []
+
             while not found and j != 11:
                 print('param', j)
                 src, found = get_corners(crop, params[j][0], params[j][1], params[j][2])

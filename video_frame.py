@@ -15,10 +15,12 @@ def atof(text):
 def natural_keys(text):
     return [atof(c) for c in re.split(r'[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)', text)]
 
+
 # path of our input videos. da modificare
-videos_path = "./Project material/output"
+videos_path = "./inference/output"
 # path of our output folder where we save the extracted frames. da modificare
-output_path = "./Project material/painting"
+output_path = "../../../Project_material/painting"
+
 try:
     os.makedirs(output_path)
 except:
@@ -27,6 +29,7 @@ except:
 # list of all the videos taken from videos_path
 label_list = []
 videos_list = []
+print(videos_path)
 for file in os.listdir(videos_path):
     if file.endswith('.txt'):
         label_list.append(file)
@@ -91,7 +94,7 @@ for video in videos_list:
         print('file name', file_name + '_' + str(my_frame))
         #save in item the only file txt that matches the frame name
         item = [l for l in label_list if l.startswith(file_name + '_' + str(my_frame) + '.txt')]
-        print(item)
+
         if item:
             cv2.imwrite(
                 f'{output_path}/{file_name}_{my_frame}.png', frame)
