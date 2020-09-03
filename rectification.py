@@ -104,6 +104,7 @@ def get_corners(image, alpha, beta, t):
             #cv2.imshow("corners_img", corners_img)
             #cv2.waitKey(0)
             return rect, True
+
     return rect, False
 
 
@@ -135,8 +136,10 @@ def warp_image(src_points, crop_img):
 
 
 im_path = "../../../Project_material/painting"
+#im_path = "Project_material/painting"
 im_list = glob.glob(f'{im_path}/*.png', recursive=False)
 output_path = "../../../Project_material/painting_rect1"
+#output_path = "Project_material/painting_rect1"
 
 try:
     os.makedirs(output_path)
@@ -149,7 +152,7 @@ for image in im_list:
     im_name = os.path.splitext(os.path.basename(image))[0]
     print(im_name)
     try:
-        file = open(im_path + '\\' + im_name + ".txt", 'r')
+        file = open(im_path + '/' + im_name + ".txt", 'r')
     except:
         continue
     txt = file.readlines()
@@ -162,7 +165,9 @@ for image in im_list:
     im_h, im_w, _ = im.shape
 
     for i in range(len(txt)): #per ogni riga del file, quindi per ogni bounding box
+
         coordinates = txt[i].split()
+        print('coordinates', coordinates)
         if coordinates[0] == '0': #considero solo i quadri, quindi id=0
 
             #prendo le coordinate dal file txt e le rendo non normalizzate
@@ -211,8 +216,8 @@ for image in im_list:
 
             if cv2.countNonZero(cv2.cvtColor(warped, cv2.COLOR_RGB2GRAY)) != 0:
                 cv2.imwrite(
-                    f'{output_path}/{im_name}-rect{i}-.png', warped)
-                print('im rect', f'{im_name}-rect{i}-.png')
+                    f'{output_path}/{im_name}-rect{i}.png', warped)
+                print('im rect', f'{im_name}-rect{i}.png')
 
                 #cv2.imshow('warped', warped)
                 #cv2.waitKey(0)

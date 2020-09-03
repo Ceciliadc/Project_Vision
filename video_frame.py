@@ -18,8 +18,10 @@ def natural_keys(text):
 
 # path of our input videos. da modificare
 videos_path = "./inference/output"
-# path of our output folder where we save the extracted frames. da modificare
+#videos_path = "union/interfaccia_comandi3-20200819T081724Z-001/interfaccia_comandi3/inference/output"
+# path of our output folder where we save the extracted frames
 output_path = "../../../Project_material/painting"
+#output_path = "Project_material/painting"
 
 try:
     os.makedirs(output_path)
@@ -91,7 +93,7 @@ for video in videos_list:
             frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         # save the frame in the output path created at the beginning. the image will be saved as VIRB0398-frame-0.png
 
-        print('file name', file_name + '_' + str(my_frame))
+        #print('file name', file_name + '_' + str(my_frame))
         #save in item the only file txt that matches the frame name
         item = [l for l in label_list if l.startswith(file_name + '_' + str(my_frame) + '.txt')]
 
